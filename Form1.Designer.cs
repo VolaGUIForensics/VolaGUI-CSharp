@@ -16,7 +16,10 @@ namespace VolaGUI_Final
         {
             string configFileLine = "";
             int counter = 1;
-            StreamReader configFile = new StreamReader("volagui.config");
+            StreamReader configFile = null;
+            if (File.Exists("volagui.config")) { configFile = new StreamReader("volagui.config"); }
+            else { throw new System.InvalidOperationException("Config File is Missing!"); }
+            
             
             while ((configFileLine = configFile.ReadLine()) != null)
             {
@@ -35,6 +38,15 @@ namespace VolaGUI_Final
                             configFileLine = System.Text.RegularExpressions.Regex.Replace(configFileLine, "^#*\\s*", "");
                             configFileLine = System.Text.RegularExpressions.Regex.Replace(configFileLine, "\\s*#*\\s*$", "");
                             this.tabPage1.Text = configFileLine;
+                            string tmpCommand = "";
+                            while ((configFileLine = configFile.ReadLine()) != null && configFileLine != "")
+                            {
+                                if(Regex.IsMatch(configFileLine,"^\\w*:\\D*:\\D*$"))
+                                {
+                                    tmpCommand = configFileLine.Substring(0,configFileLine.IndexOf(":"));
+                                    this.commandSelection.Items.Add(tmpCommand);
+                                }
+                            }
                         }else
                         {
                             TabPage newTab = new TabPage("tabPage" + counter.ToString());
@@ -52,6 +64,7 @@ namespace VolaGUI_Final
                             commandBox newCommandBox = new commandBox();
                             newCommandBox.initiate();
                             newTab.Controls.Add(newCommandBox.commandGBox);
+                            
 
                             executionBox newExecutionBox = new executionBox();
                             newExecutionBox.initiate();
@@ -65,12 +78,24 @@ namespace VolaGUI_Final
                             configFileLine = System.Text.RegularExpressions.Regex.Replace(configFileLine, "\\s*#*\\s*$", "");
                             newTab.Text = configFileLine;
                             this.tabControl1.TabPages.Add(newTab);
+
+                            while ((configFileLine = configFile.ReadLine()) != null && configFileLine != "")
+                            {
+                                string tmpCommand;
+                                if(Regex.IsMatch(configFileLine,"^[\\D\\d]+:[\\D\\d]+:\\D*$"))
+                                {
+                                    tmpCommand = configFileLine.Substring(0,configFileLine.IndexOf(":"));
+                                    newCommandBox.addDropDownData(tmpCommand);
+
+                                }
+                            }
                             
                         }
                         counter++;
                     }
                     
                 }
+                
 
             }
             configFile.Close();
@@ -202,12 +227,14 @@ namespace VolaGUI_Final
             this.commandDescription.MinimumSize = new System.Drawing.Size(411, 45);
             this.commandDescription.Multiline = true;
             this.commandDescription.Name = "commandDescription";
+            this.commandDescription.ReadOnly = true;
             this.commandDescription.Size = new System.Drawing.Size(411, 45);
             this.commandDescription.TabIndex = 1;
             this.commandDescription.Text = "Description";
             // 
             // commandSelection
             // 
+            this.commandSelection.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.commandSelection.FormattingEnabled = true;
             this.commandSelection.Location = new System.Drawing.Point(3, 16);
             this.commandSelection.Name = "commandSelection";
@@ -329,6 +356,11 @@ namespace VolaGUI_Final
         private ComboBox commandSelection = new ComboBox();
         private TextBox commandDescription = new TextBox();
 
+        public void addDropDownData(string command)
+        {
+            commandSelection.Items.Add(command);
+        }
+
         public void initiate()
         {
             commandGBox.Controls.Add(commandDescription);
@@ -352,14 +384,17 @@ namespace VolaGUI_Final
             this.commandDescription.Size = new System.Drawing.Size(411, 45);
             this.commandDescription.TabIndex = 1;
             this.commandDescription.Text = "Description";
+            this.commandDescription.ReadOnly = true;
             // 
             // commandSelection
             // 
+            this.commandSelection.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.commandSelection.FormattingEnabled = true;
             this.commandSelection.Location = new System.Drawing.Point(3, 16);
             this.commandSelection.Name = "commandSelection";
             this.commandSelection.Size = new System.Drawing.Size(158, 21);
             this.commandSelection.TabIndex = 0;
+            
 
             this.commandGBox.SuspendLayout();
             this.commandGBox.ResumeLayout(false);
