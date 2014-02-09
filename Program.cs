@@ -14,14 +14,16 @@ namespace VolaGUI_Final
         [STAThread]
         static void Main()
         {
+            List<string> commands = new List<string>(); 
             Application.EnableVisualStyles( );
             Application.SetCompatibleTextRenderingDefault(false);
-            volaguiForm mainGUI = new volaguiForm( );
-            mainGUI.AddTabs( );
-            Application.Run(mainGUI);
             
-            //Read in Config File
-
+            //Initialize GUI for Use
+            volaguiForm mainGUI = new volaguiForm( );
+            mainGUI.AddTabs(commands);
+            
+            
+            Application.Run(mainGUI);
         }
     }
 }
